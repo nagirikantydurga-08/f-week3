@@ -1,0 +1,158 @@
+
+import 'package:flutter/material.dart';
+
+String getScreenCategory(double width) {
+  if (width < 600) return 'Mobile';
+  if (width < 1024) return 'Tablet';
+  return 'Desktop';
+}
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: ResponsiveDashboard(),
+  ));
+}
+
+class ResponsiveDashboard extends StatelessWidget {
+  const ResponsiveDashboard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final orientation = media.orientation == Orientation.portrait
+        ? 'Portrait'
+        : 'Landscape';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Responsive UI - Part B'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+      ),
+      body: OrientationBuilder(
+        builder: (context, currentOrientation) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final category = getScreenCategory(width);
+              final portrait =
+                  currentOrientation == Orientation.portrait;
+
+              final columns = width < 600
+                  ? 1
+                  : width < 1024
+                      ? 2
+                      : 3;
+
+              final cards = [
+                buildCard('Certificates', Icons.workspace_premium,
+                    Colors.orange),
+                buildCard('Hackathons', Icons.code, Colors.purple),
+                buildCard('Projects', Icons.folder, Colors.teal),
+              ];
+
+              Widget content;
+
+              if (width < 600 && !portrait) {
+                content = Row(
+                  children: cards.map((card) {
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: card,
+                      ),
+                    );
+                  }).toList(),
+                );
+              } else {
+                content = GridView.count(
+                  crossAxisCount: columns,
+                  padding: const EdgeInsets.all(12),
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  children: cards,
+                );
+              }
+
+              if (category == 'Desktop') {
+                content = Row(
+                  children: [
+                    NavigationRail(
+                      selectedIndex: 0,
+                      labelType: NavigationRailLabelType.all,
+                      destinations: const [
+                        NavigationRailDestination(
+                          icon: Icon(Icons.dashboard),
+                          label: Text('Home'),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.school),
+                          label: Text('Learning'),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.person),
+                          label: Text('Profile'),
+                        ),
+                      ],
+                    ),
+                    const VerticalDivider(width: 1),
+                    Expanded(child: content),
+                  ],
+                );
+              }
+
+              return Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.indigo.shade50,
+                    child: Text(
+                      'Screen: $category $orientation\n'
+                      'Width: ${media.size.width.toStringAsFixed(0)} px\n'
+                      'Active layout: $columns column(s)',
+                    ),
+                  ),
+                  Expanded(child: content),
+                  Container(
+                    width: double.infinity,
+                    color: Colors.indigo,
+                    padding: const EdgeInsets.all(14),
+                    child: const Text(
+                      'Responsive UI Experiment - Part B',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildCard(String title, IconData icon, Color color) {
+    return Card(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 38, color: color),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
