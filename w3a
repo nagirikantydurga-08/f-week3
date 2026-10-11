@@ -1,0 +1,90 @@
+
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: ResponsiveHome(),
+  ));
+}
+
+class ResponsiveHome extends StatelessWidget {
+  const ResponsiveHome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final columns = screenWidth < 600
+        ? 1
+        : screenWidth < 1024
+            ? 2
+            : 3;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Responsive UI - Part A'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            color: Colors.indigo.shade50,
+            child: Text(
+              'Screen width: ${screenWidth.toStringAsFixed(0)} px\n'
+              'Active layout: $columns column(s)',
+            ),
+          ),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cards = [
+                  buildCard('Header', Colors.indigo),
+                  buildCard('Content', Colors.teal),
+                  buildCard('Footer', Colors.deepOrange),
+                ];
+
+                return GridView.count(
+                  crossAxisCount: columns,
+                  padding: const EdgeInsets.all(12),
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  children: cards,
+                );
+              },
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            color: Colors.indigo,
+            padding: const EdgeInsets.all(14),
+            child: const Text(
+              'Responsive UI Experiment - Part A',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCard(String title, Color color) {
+    return Card(
+      color: color.withValues(alpha: 0.12),
+      child: Center(
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+}
